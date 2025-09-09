@@ -56,34 +56,24 @@ class SQLBookRepository(BookRepositoryInterface):
         self.db.commit()
         return True
 
-    def search_by_title(self, title: str) -> List[Book]:
-        """Search books by title (case-insensitive partial match)"""
-        return self.db.query(Book).filter(
-            Book.title.ilike(f"%{title}%")
-        ).all()
-
-    def search_by_author(self, author: str) -> List[Book]:
-        """Search books by author (case-insensitive partial match)"""
-        return self.db.query(Book).filter(
-            Book.author.ilike(f"%{author}%")
-        ).all()
-
-    def get_by_created_by(self, created_by: str) -> List[Book]:
-        """Get all books created by a specific user"""
-        return self.db.query(Book).filter(
-            Book.created_by == created_by
-        ).all()
-
-    def search(self, title: Optional[str] = None, author: Optional[str] = None,
-               created_by: Optional[str] = None) -> List[Book]:
-        """Advanced search with multiple criteria"""
+    def search(self, title: Optional[str] = None, author: Optional[str] = None, created_by: Optional[str] = None) -> List[Book]:
+        """Search books by title, author, or created_by with partial matching"""
         query = self.db.query(Book)
 
+        # Build dynamic search conditions
+        conditions = []
+
         if title:
-            query = query.filter(Book.title.ilike(f"%{title}%"))
+            conditions.append(Book.title.contains(title))
+
         if author:
-            query = query.filter(Book.author.ilike(f"%{author}%"))
+            conditions.append(Book.author.contains(author))
+
         if created_by:
-            query = query.filter(Book.created_by == created_by)
+            conditions.append(Book.created_by.contains(created_by))
+
+        # Apply search conditions with OR logic
+        if conditions:
+            query = query.filter(or_(*conditions))
 
         return query.all()

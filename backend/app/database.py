@@ -1,5 +1,4 @@
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from typing import Generator
 import os
@@ -16,8 +15,13 @@ engine = create_engine(
 # Create SessionLocal class - this is the Factory Pattern!
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Base class for models - imported from models.py
-from .models import Base
+# Import Base from models - using try/except to handle both relative and absolute imports
+try:
+    # Try relative import first (when used as module)
+    from .models import Base
+except ImportError:
+    # Fall back to absolute import (when script is run directly)
+    from models import Base
 
 def create_tables():
     """Create all database tables"""

@@ -29,25 +29,15 @@ class BookRepositoryInterface(ABC):
 
     @abstractmethod
     def update(self, book_id: int, book_update: dict) -> Optional[Book]:
-        """Update an existing book"""
+        """Update a book by its ID"""
         pass
 
     @abstractmethod
     def delete(self, book_id: int) -> bool:
-        """Delete a book by ID, returns True if successful"""
+        """Delete a book by its ID"""
         pass
 
     @abstractmethod
-    def search_by_title(self, title: str) -> List[Book]:
-        """Search books by title (partial match)"""
-        pass
-
-    @abstractmethod
-    def search_by_author(self, author: str) -> List[Book]:
-        """Search books by author (partial match)"""
-        pass
-
-    @abstractmethod
-    def get_by_created_by(self, created_by: str) -> List[Book]:
-        """Get all books created by a specific user"""
+    def search(self, title: Optional[str] = None, author: Optional[str] = None, created_by: Optional[str] = None) -> List[Book]:
+        """Search books by title, author, or created_by"""
         pass

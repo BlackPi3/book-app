@@ -1,16 +1,26 @@
 from fastapi import FastAPI, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
+from contextlib import asynccontextmanager
 from .database import get_db, create_tables
 from .repositories import BookRepositoryInterface, SQLBookRepository
-from .schemas import BookCreate, BookResponse, BookUpdate, BookSearch, BookList
+from .schemas import BookCreate, BookResponse, BookUpdate
 from .models import Book
+
+# Lifespan event handler to replace deprecated on_event
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    create_tables()
+    yield
+    # Shutdown (if needed in future)
 
 # Create FastAPI application
 app = FastAPI(
     title="BookApp API",
     description="A REST API for managing books with Repository Pattern and Dependency Injection",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 # Dependency Injection: Repository Factory
@@ -21,11 +31,6 @@ def get_book_repository(db: Session = Depends(get_db)) -> BookRepositoryInterfac
     provide the database session and create the repository.
     """
     return SQLBookRepository(db)
-
-@app.on_event("startup")
-async def startup_event():
-    """Create database tables on startup"""
-    create_tables()
 
 # RESTful API Endpoints
 
@@ -119,16 +124,13 @@ async def update_book(
     # Convert Pydantic model to dict, excluding None values
     update_data = book_update.model_dump(exclude_unset=True)
 
-    if not update_data:
-        raise HTTPException(status_code=400, detail="No fields provided for update")
-
     updated_book = repo.update(book_id, update_data)
     if not updated_book:
         raise HTTPException(status_code=404, detail="Book not found")
 
     return updated_book
 
-@app.delete("/books/{book_id}", summary="Delete a book")
+@app.delete("/books/{book_id}", status_code=204, summary="Delete a book")
 async def delete_book(
     book_id: int,
     repo: BookRepositoryInterface = Depends(get_book_repository)
@@ -137,57 +139,10 @@ async def delete_book(
     Delete a book by ID.
 
     RESTful endpoint: DELETE /books/{id}
+    Returns 204 No Content on success.
     """
     success = repo.delete(book_id)
     if not success:
         raise HTTPException(status_code=404, detail="Book not found")
 
-    return {"message": f"Book {book_id} deleted successfully"}
-
-@app.get("/books/search/title/{title}", response_model=List[BookResponse],
-         summary="Search books by title")
-async def search_books_by_title(
-    title: str,
-    repo: BookRepositoryInterface = Depends(get_book_repository)
-):
-    """
-    Search books by title (partial match).
-
-    Alternative search endpoint demonstrating path parameters.
-    """
-    books = repo.search_by_title(title)
-    return books
-
-@app.get("/books/search/author/{author}", response_model=List[BookResponse],
-         summary="Search books by author")
-async def search_books_by_author(
-    author: str,
-    repo: BookRepositoryInterface = Depends(get_book_repository)
-):
-    """
-    Search books by author (partial match).
-    """
-    books = repo.search_by_author(author)
-    return books
-
-@app.get("/books/created-by/{created_by}", response_model=List[BookResponse],
-         summary="Get books by creator")
-async def get_books_by_creator(
-    created_by: str,
-    repo: BookRepositoryInterface = Depends(get_book_repository)
-):
-    """
-    Get all books created by a specific user.
-    """
-    books = repo.get_by_created_by(created_by)
-    return books
-
-# Health check endpoint
-@app.get("/health", summary="Health check")
-async def health_check():
-    """Simple health check endpoint"""
-    return {"status": "healthy", "service": "BookApp API"}
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    return None  # 204 No Content
