@@ -1,1 +1,2 @@
-# Makes 'backend' a Python package to allow 'backend.app' imports in tests.
+# This file makes the backend directory a proper Python package
+
