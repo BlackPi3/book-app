@@ -21,9 +21,9 @@ from sqlalchemy.pool import StaticPool
 import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.models import Base, Book
-from app.repositories.sql_book_repository import SQLBookRepository
-from app.repositories.book_repository_interface import BookRepositoryInterface
+from backend.app.models import Base, Book
+from backend.app.repositories.sql_book_repository import SQLBookRepository
+from backend.app.repositories.book_repository_interface import BookRepositoryInterface
 
 @pytest.fixture(scope="function")
 def test_engine():
@@ -142,25 +142,43 @@ def multiple_sample_books():
         }
     ]
 
-def create_test_books(session, book_data_list):
+@pytest.fixture
+def create_test_books(test_session):
     """
-    Utility function to create multiple books in the test database.
+    Pytest fixture for creating multiple books in the test database.
 
-    This helper function:
+    This fixture provides a function that:
     - Creates multiple books at once
     - Commits to database
     - Returns created book instances
+    
+    Usage:
+        def test_something(create_test_books):
+            books = create_test_books([
+                {"title": "Book 1", "author": "Author 1", "created_by": "user1"},
+                {"title": "Book 2", "author": "Author 2", "created_by": "user2"}
+            ])
+            assert len(books) == 2
+
+    Args:
+        book_data_list: List of dictionaries containing book data
+        
+    Returns:
+        Function that takes book_data_list and returns List of created Book instances
     """
-    books = []
-    for book_data in book_data_list:
-        book = Book(**book_data)
-        session.add(book)
-        books.append(book)
+    def _create_books(book_data_list):
+        books = []
+        for book_data in book_data_list:
+            book = Book(**book_data)
+            test_session.add(book)
+            books.append(book)
 
-    session.commit()
+        test_session.commit()
 
-    # Refresh to get IDs
-    for book in books:
-        session.refresh(book)
+        # Refresh to get IDs
+        for book in books:
+            test_session.refresh(book)
 
-    return books
+        return books
+
+    return _create_books

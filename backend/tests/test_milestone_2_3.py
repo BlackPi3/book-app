@@ -15,9 +15,10 @@ from sqlalchemy.pool import StaticPool
 # Add proper path setup for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.main import app, get_book_repository
-from app.models import Base
-from app.repositories.sql_book_repository import SQLBookRepository
+from backend.app.main import app, get_book_repository
+from backend.app.models import Base
+from backend.app.repositories.sql_book_repository import SQLBookRepository
+
 
 @pytest.fixture(scope="function")
 def test_client():
@@ -46,6 +47,7 @@ def test_client():
     # Cleanup
     app.dependency_overrides.clear()
 
+
 def test_api_server(test_client):
     """Test that the API server is running"""
     response = test_client.get("/")
@@ -54,6 +56,7 @@ def test_api_server(test_client):
     assert "message" in data
     assert "BookApp API" in data["message"]
     print("✅ API server is running and responding!")
+
 
 def test_swagger_docs():
     """Test that Swagger documentation is accessible"""
@@ -66,6 +69,7 @@ def test_swagger_docs():
     assert "info" in schema
     assert schema["info"]["title"] == "BookApp API"
     print("✅ OpenAPI schema is accessible!")
+
 
 def test_create_book_endpoint(test_client):
     """Test POST /books endpoint"""
@@ -83,7 +87,7 @@ def test_create_book_endpoint(test_client):
     assert data["author"] == book_data["author"]
     assert "id" in data
     print("✅ POST /books endpoint working!")
-    return data["id"]
+
 
 def test_get_books_endpoint(test_client):
     """Test GET /books endpoint"""
@@ -104,6 +108,7 @@ def test_get_books_endpoint(test_client):
     assert len(data) > 0
     print("✅ GET /books endpoint working!")
 
+
 def test_get_book_by_id_endpoint(test_client):
     """Test GET /books/{id} endpoint"""
     # Create a book first
@@ -123,6 +128,7 @@ def test_get_book_by_id_endpoint(test_client):
     assert data["id"] == book_id
     assert data["title"] == book_data["title"]
     print("✅ GET /books/{id} endpoint working!")
+
 
 def test_update_book_endpoint(test_client):
     """Test PUT /books/{id} endpoint"""
@@ -148,6 +154,7 @@ def test_update_book_endpoint(test_client):
     assert data["author"] == "Updated Author"
     print("✅ PUT /books/{id} endpoint working!")
 
+
 def test_delete_book_endpoint(test_client):
     """Test DELETE /books/{id} endpoint"""
     # Create a book first
@@ -168,6 +175,7 @@ def test_delete_book_endpoint(test_client):
     assert get_response.status_code == 404
     print("✅ DELETE /books/{id} endpoint working!")
 
+
 def test_search_functionality(test_client):
     """Test search query parameters"""
     # Create test books
@@ -187,6 +195,7 @@ def test_search_functionality(test_client):
     assert len(data) >= 2  # Should find at least 2 Python books
     print("✅ Search functionality working!")
 
+
 def test_pagination(test_client):
     """Test pagination parameters"""
     # Create multiple books
@@ -205,6 +214,7 @@ def test_pagination(test_client):
     assert len(data) == 5
     print("✅ Pagination working!")
 
+
 def test_validation_errors(test_client):
     """Test input validation"""
     # Test missing required fields
@@ -212,6 +222,7 @@ def test_validation_errors(test_client):
     response = test_client.post("/books", json=invalid_data)
     assert response.status_code == 422  # Validation error
     print("✅ Input validation working!")
+
 
 def run_milestone_2_3_tests():
     """Run all milestone 2.3 tests"""
@@ -262,6 +273,7 @@ def run_milestone_2_3_tests():
         print(f"❌ MILESTONE 2.3 INCOMPLETE: {e}")
     finally:
         app.dependency_overrides.clear()
+
 
 if __name__ == "__main__":
     run_milestone_2_3_tests()

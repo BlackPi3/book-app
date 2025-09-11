@@ -77,3 +77,15 @@ class SQLBookRepository(BookRepositoryInterface):
             query = query.filter(or_(*conditions))
 
         return query.all()
+
+    def search_by_title(self, title: str) -> List[Book]:
+        """Search books by title"""
+        return self.db.query(Book).filter(Book.title.contains(title)).all()
+
+    def search_by_author(self, author: str) -> List[Book]:
+        """Search books by author"""
+        return self.db.query(Book).filter(Book.author.contains(author)).all()
+
+    def get_by_created_by(self, created_by: str) -> List[Book]:
+        """Get books by creator"""
+        return self.db.query(Book).filter(Book.created_by == created_by).all()

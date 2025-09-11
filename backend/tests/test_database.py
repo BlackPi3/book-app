@@ -19,12 +19,7 @@ import os
 import sys
 from sqlalchemy import text, inspect
 
-# Add proper path setup for imports
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from app.models import Book, Base
-from app.database import create_database_engine, create_tables, drop_tables
-from conftest import create_test_books
+from backend.app.models import Book
 
 class TestDatabaseInfrastructure:
     """Test suite for database infrastructure and configuration"""
@@ -155,7 +150,7 @@ class TestDatabaseConstraints:
 class TestDatabasePerformance:
     """Test suite for database performance and optimization"""
 
-    def test_index_performance_on_title_search(self, test_session):
+    def test_index_performance_on_title_search(self, test_session, create_test_books):
         """
         Test that title search performance is optimized by indexes.
 
@@ -173,7 +168,7 @@ class TestDatabasePerformance:
                 "created_by": "performance_test"
             })
 
-        create_test_books(test_session, large_dataset)
+        create_test_books(large_dataset)
 
         # Act - Measure search performance
         start_time = time.time()
@@ -189,7 +184,7 @@ class TestDatabasePerformance:
         assert len(result) >= 10  # Should find books with "1" in title (10, 11, 12, etc.)
         assert search_time < 0.5  # Should be fast due to index
 
-    def test_composite_index_performance(self, test_session):
+    def test_composite_index_performance(self, test_session, create_test_books):
         """
         Test that composite index improves multi-column search performance.
 
@@ -206,7 +201,7 @@ class TestDatabasePerformance:
                 "created_by": "composite_test"
             })
 
-        create_test_books(test_session, test_data)
+        create_test_books(test_data)
 
         # Act - Measure composite search performance
         start_time = time.time()
@@ -232,7 +227,7 @@ class TestDatabasePerformance:
         - Connection pooling effectiveness
         - Resource cleanup efficiency
         """
-        from app.database import TestSessionLocal
+        from backend.app.database import TestSessionLocal
 
         # Act - Measure session creation performance
         start_time = time.time()

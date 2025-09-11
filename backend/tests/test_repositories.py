@@ -14,16 +14,10 @@ Learning Points:
 """
 
 import pytest
-import os
-import sys
 from sqlalchemy.exc import IntegrityError
 
-# Add proper path setup for imports
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from app.models import Book
-from app.repositories.book_repository_interface import BookRepositoryInterface
-from conftest import create_test_books
+from backend.app.models import Book
+from backend.app.repositories.book_repository_interface import BookRepositoryInterface
 
 class TestBookRepository:
     """Test suite for BookRepository CRUD operations"""
@@ -114,7 +108,7 @@ class TestBookRepository:
         # Assert
         assert books == []
 
-    def test_get_all_with_pagination(self, test_repository: BookRepositoryInterface, multiple_sample_books, test_session):
+    def test_get_all_with_pagination(self, test_repository: BookRepositoryInterface, multiple_sample_books, test_session, create_test_books):
         """
         Test get_all with pagination parameters.
 
@@ -124,7 +118,7 @@ class TestBookRepository:
         - Consistent ordering
         """
         # Arrange - Create multiple books
-        create_test_books(test_session, multiple_sample_books)
+        create_test_books(multiple_sample_books)
 
         # Act - Get first 2 books
         first_page = test_repository.get_all(skip=0, limit=2)
@@ -219,7 +213,7 @@ class TestBookRepository:
 class TestBookRepositorySearch:
     """Test suite for BookRepository search functionality"""
 
-    def test_search_by_title(self, test_repository: BookRepositoryInterface, multiple_sample_books, test_session):
+    def test_search_by_title(self, test_repository: BookRepositoryInterface, multiple_sample_books, create_test_books):
         """
         Test searching books by title.
 
@@ -229,7 +223,7 @@ class TestBookRepositorySearch:
         - Index performance (implicitly)
         """
         # Arrange
-        create_test_books(test_session, multiple_sample_books)
+        create_test_books(multiple_sample_books)
 
         # Act - Search for books with "Code" in title
         results = test_repository.search(title="Code")
@@ -238,7 +232,7 @@ class TestBookRepositorySearch:
         assert len(results) == 1
         assert "Clean Code" in results[0].title
 
-    def test_search_by_author(self, test_repository: BookRepositoryInterface, multiple_sample_books, test_session):
+    def test_search_by_author(self, test_repository: BookRepositoryInterface, multiple_sample_books, create_test_books):
         """
         Test searching books by author.
 
@@ -247,7 +241,7 @@ class TestBookRepositorySearch:
         - Partial matching behavior
         """
         # Arrange
-        create_test_books(test_session, multiple_sample_books)
+        create_test_books(multiple_sample_books)
 
         # Act - Search for books by Martin (matches multiple books)
         results = test_repository.search(author="Martin")
@@ -258,7 +252,7 @@ class TestBookRepositorySearch:
         assert "Robert Martin" in authors
         assert "Martin Fowler" in authors
 
-    def test_search_by_created_by(self, test_repository: BookRepositoryInterface, multiple_sample_books, test_session):
+    def test_search_by_created_by(self, test_repository: BookRepositoryInterface, multiple_sample_books, create_test_books):
         """
         Test searching books by creator.
 
@@ -267,7 +261,7 @@ class TestBookRepositorySearch:
         - Multiple results handling
         """
         # Arrange
-        create_test_books(test_session, multiple_sample_books)
+        create_test_books(multiple_sample_books)
 
         # Act - Search for books created by admin
         results = test_repository.search(created_by="admin")
@@ -277,7 +271,7 @@ class TestBookRepositorySearch:
         for book in results:
             assert book.created_by == "admin"
 
-    def test_search_multiple_criteria(self, test_repository: BookRepositoryInterface, multiple_sample_books, test_session):
+    def test_search_multiple_criteria(self, test_repository: BookRepositoryInterface, multiple_sample_books, create_test_books):
         """
         Test searching with multiple criteria (OR logic).
 
@@ -286,7 +280,7 @@ class TestBookRepositorySearch:
         - OR logic between criteria
         """
         # Arrange
-        create_test_books(test_session, multiple_sample_books)
+        create_test_books(multiple_sample_books)
 
         # Act - Search for books with "Design" in title OR by "Robert Martin"
         results = test_repository.search(title="Design", author="Robert Martin")
@@ -297,7 +291,7 @@ class TestBookRepositorySearch:
         assert ("Design Patterns", "Gang of Four") in titles_and_authors
         assert ("Clean Code", "Robert Martin") in titles_and_authors
 
-    def test_search_no_matches(self, test_repository: BookRepositoryInterface, multiple_sample_books, test_session):
+    def test_search_no_matches(self, test_repository: BookRepositoryInterface, multiple_sample_books, create_test_books):
         """
         Test search with no matching results.
 
@@ -306,7 +300,7 @@ class TestBookRepositorySearch:
         - Performance with no matches
         """
         # Arrange
-        create_test_books(test_session, multiple_sample_books)
+        create_test_books(multiple_sample_books)
 
         # Act
         results = test_repository.search(title="NonexistentBook")
@@ -314,7 +308,7 @@ class TestBookRepositorySearch:
         # Assert
         assert results == []
 
-    def test_search_empty_criteria(self, test_repository: BookRepositoryInterface, multiple_sample_books, test_session):
+    def test_search_empty_criteria(self, test_repository: BookRepositoryInterface, multiple_sample_books, create_test_books):
         """
         Test search with no criteria returns all books.
 
@@ -323,7 +317,7 @@ class TestBookRepositorySearch:
         - Fallback to get_all functionality
         """
         # Arrange
-        create_test_books(test_session, multiple_sample_books)
+        create_test_books(multiple_sample_books)
 
         # Act
         results = test_repository.search()
@@ -335,7 +329,7 @@ class TestBookRepositorySearch:
 class TestBookRepositoryPerformance:
     """Test suite for performance-related repository functionality"""
 
-    def test_large_dataset_search_performance(self, test_repository: BookRepositoryInterface, test_session):
+    def test_large_dataset_search_performance(self, test_repository: BookRepositoryInterface, create_test_books):
         """
         Test search performance with larger dataset.
 
@@ -353,7 +347,7 @@ class TestBookRepositoryPerformance:
                 "created_by": f"user{i % 5}"   # 5 different users
             })
 
-        create_test_books(test_session, large_dataset)
+        create_test_books(large_dataset)
 
         # Act - Search should be fast due to indexes
         import time
@@ -365,7 +359,7 @@ class TestBookRepositoryPerformance:
         assert len(results) == 10  # Should find 10 books by "Author 1"
         assert search_time < 1.0  # Should complete within 1 second
 
-    def test_pagination_performance(self, test_repository: BookRepositoryInterface, test_session):
+    def test_pagination_performance(self, test_repository: BookRepositoryInterface, create_test_books):
         """
         Test pagination performance with larger dataset.
 
@@ -382,7 +376,7 @@ class TestBookRepositoryPerformance:
                 "created_by": "test_user"
             })
 
-        create_test_books(test_session, large_dataset)
+        create_test_books(large_dataset)
 
         # Act - Test pagination performance
         import time

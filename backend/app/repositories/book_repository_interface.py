@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
-from sqlalchemy.orm import Session
 from ..models import Book
 
 class BookRepositoryInterface(ABC):
@@ -40,4 +39,19 @@ class BookRepositoryInterface(ABC):
     @abstractmethod
     def search(self, title: Optional[str] = None, author: Optional[str] = None, created_by: Optional[str] = None) -> List[Book]:
         """Search books by title, author, or created_by"""
+        pass
+
+    @abstractmethod
+    def search_by_title(self, title: str) -> List[Book]:
+        """Search books by title"""
+        pass
+
+    @abstractmethod
+    def search_by_author(self, author: str) -> List[Book]:
+        """Search books by author"""
+        pass
+
+    @abstractmethod
+    def get_by_created_by(self, created_by: str) -> List[Book]:
+        """Get books by creator"""
         pass

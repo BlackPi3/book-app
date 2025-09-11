@@ -6,56 +6,50 @@ This script tests the Book entity design and architecture understanding.
 
 def test_book_entity():
     """Test that the Book entity is properly designed with all required attributes."""
-    try:
-        from backend.app.models import Book, Base
-        from sqlalchemy import create_engine
-        from sqlalchemy.orm import sessionmaker
+    from backend.app.models import Book, Base
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
 
-        # Create in-memory SQLite database for testing
-        engine = create_engine("sqlite:///:memory:")
-        Base.metadata.create_all(engine)
+    # Create in-memory SQLite database for testing
+    engine = create_engine("sqlite:///:memory:")
+    Base.metadata.create_all(engine)
 
-        # Create session
-        SessionLocal = sessionmaker(bind=engine)
-        db = SessionLocal()
+    # Create session
+    SessionLocal = sessionmaker(bind=engine)
+    db = SessionLocal()
 
-        # Test Book entity creation
-        book = Book(
-            title="Test Architecture Book",
-            author="Design Patterns Expert",
-            created_by="System"
-        )
+    # Test Book entity creation
+    book = Book(
+        title="Test Architecture Book",
+        author="Design Patterns Expert",
+        created_by="System"
+    )
 
-        # Test attributes exist
-        assert hasattr(book, 'id')
-        assert hasattr(book, 'title')
-        assert hasattr(book, 'author')
-        assert hasattr(book, 'created_on')
-        assert hasattr(book, 'created_by')
+    # Test attributes exist
+    assert hasattr(book, 'id')
+    assert hasattr(book, 'title')
+    assert hasattr(book, 'author')
+    assert hasattr(book, 'created_on')
+    assert hasattr(book, 'created_by')
 
-        # Test saving to database
-        db.add(book)
-        db.commit()
-        db.refresh(book)
+    # Test saving to database
+    db.add(book)
+    db.commit()
+    db.refresh(book)
 
-        # Verify the book was saved with an ID
-        assert book.id is not None
-        assert book.title == "Test Architecture Book"
-        assert book.author == "Design Patterns Expert"
-        assert book.created_by == "System"
-        assert book.created_on is not None
+    # Verify the book was saved with an ID
+    assert book.id is not None
+    assert book.title == "Test Architecture Book"
+    assert book.author == "Design Patterns Expert"
+    assert book.created_by == "System"
+    assert book.created_on is not None
 
-        print("✅ Book entity design is correct!")
-        print(f"✅ Book created: {book}")
-        print(f"✅ Book ID: {book.id}")
-        print(f"✅ Created on: {book.created_on}")
+    print("✅ Book entity design is correct!")
+    print(f"✅ Book created: {book}")
+    print(f"✅ Book ID: {book.id}")
+    print(f"✅ Created on: {book.created_on}")
 
-        db.close()
-        return True
-
-    except Exception as e:
-        print(f"❌ Book entity test failed: {e}")
-        return False
+    db.close()
 
 def test_architecture_understanding():
     """Test understanding of architecture principles."""
@@ -75,14 +69,26 @@ def test_architecture_understanding():
     print("   - Audit fields for tracking (created_on, created_by)")
     print("   - Database indexes for performance")
 
-    return True
+    # Add assertion to avoid pytest warning
+    assert True
 
 if __name__ == "__main__":
     print("🧪 Testing MILESTONE 1.2 completion...")
     print("=" * 60)
 
-    entity_ok = test_book_entity()
-    arch_ok = test_architecture_understanding()
+    try:
+        test_book_entity()
+        entity_ok = True
+    except Exception as e:
+        print(f"❌ Book entity test failed: {e}")
+        entity_ok = False
+
+    try:
+        test_architecture_understanding()
+        arch_ok = True
+    except Exception as e:
+        print(f"❌ Architecture test failed: {e}")
+        arch_ok = False
 
     print("\n" + "=" * 60)
     if entity_ok and arch_ok:
