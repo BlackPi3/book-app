@@ -19,9 +19,9 @@ from sqlalchemy.pool import StaticPool
 # Import from our app modules with proper path setup
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from backend.app.main import app, get_book_repository
-from backend.app.models import Base, Book
-from backend.app.repositories.sql_book_repository import SQLBookRepository
+from app.main import app, get_book_repository
+from app.models import Base, Book
+from app.repositories.sql_book_repository import SQLBookRepository
 
 @pytest.fixture(scope="function")
 def test_client():

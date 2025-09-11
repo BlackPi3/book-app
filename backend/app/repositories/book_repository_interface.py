@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
-from ..models import Book
+from app.models import Book
 
 class BookRepositoryInterface(ABC):
     """

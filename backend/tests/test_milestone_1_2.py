@@ -6,7 +6,7 @@ This script tests the Book entity design and architecture understanding.
 
 def test_book_entity():
     """Test that the Book entity is properly designed with all required attributes."""
-    from backend.app.models import Book, Base
+    from app.models import Book, Base
     from sqlalchemy import create_engine
     from sqlalchemy.orm import sessionmaker
 

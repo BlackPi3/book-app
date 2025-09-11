@@ -2,7 +2,7 @@ from typing import List, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from .book_repository_interface import BookRepositoryInterface
-from ..models import Book
+from app.models import Book
 
 class SQLBookRepository(BookRepositoryInterface):
     """

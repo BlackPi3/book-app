@@ -19,7 +19,8 @@ import os
 import sys
 from sqlalchemy import text, inspect
 
-from backend.app.models import Book
+from app.models import Book
+
 
 class TestDatabaseInfrastructure:
     """Test suite for database infrastructure and configuration"""
@@ -227,7 +228,7 @@ class TestDatabasePerformance:
         - Connection pooling effectiveness
         - Resource cleanup efficiency
         """
-        from backend.app.database import TestSessionLocal
+        from app.database import TestSessionLocal
 
         # Act - Measure session creation performance
         start_time = time.time()

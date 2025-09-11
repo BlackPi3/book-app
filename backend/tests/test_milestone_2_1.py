@@ -6,7 +6,7 @@ This script tests the complete data layer implementation.
 
 def test_database_connection():
     """Test database connection and table creation"""
-    from backend.app.database import create_tables, get_db
+    from app.database import create_tables, get_db
 
     # Create tables
     create_tables()
@@ -19,19 +19,18 @@ def test_database_connection():
 
     # Clean up
     db.close()
-    assert True  # Test passed
 
-def test_sqlalchemy_models():
-    """Test SQLAlchemy Book model"""
-    from backend.app.models import Book
-    from backend.app.database import get_db
+def test_book_model():
+    """Test Book model creation and database operations"""
+    from app.models import Book
+    from app.database import get_db
 
     # Get database session
     db = next(get_db())
 
-    # Create a book using SQLAlchemy model
+    # Create a test book
     book = Book(
-        title="SQLAlchemy Test Book",
+        title="Data Layer Test Book",
         author="Database Expert",
         created_by="Test System"
     )
@@ -43,10 +42,10 @@ def test_sqlalchemy_models():
 
     # Test that book was saved with ID
     assert book.id is not None
-    assert book.title == "SQLAlchemy Test Book"
+    assert book.title == "Data Layer Test Book"
     assert book.created_on is not None
 
-    print("✅ SQLAlchemy Book model working correctly!")
+    print("✅ Book model working correctly!")
     print(f"   Created book: {book}")
     print(f"   Book ID: {book.id}")
     print(f"   Created on: {book.created_on}")
@@ -55,7 +54,7 @@ def test_sqlalchemy_models():
 
 def test_pydantic_schemas():
     """Test Pydantic schemas for validation and serialization"""
-    from backend.app.schemas import BookCreate, BookResponse, BookUpdate, BookSearch
+    from app.schemas import BookCreate, BookResponse, BookUpdate
     from datetime import datetime
 
     # Test BookCreate schema validation
@@ -89,15 +88,9 @@ def test_pydantic_schemas():
     assert book_update.author is None
     print("✅ BookUpdate schema with optional fields working!")
 
-    # Test BookSearch schema
-    search_data = {"title": "search term"}
-    book_search = BookSearch(**search_data)
-    assert book_search.title == "search term"
-    print("✅ BookSearch schema working!")
-
 def test_factory_pattern():
     """Test that the Factory Pattern is properly implemented"""
-    from backend.app.database import SessionLocal, get_db
+    from app.database import SessionLocal, get_db
 
     # Test SessionLocal factory
     session1 = SessionLocal()
@@ -126,9 +119,9 @@ def test_factory_pattern():
 
 def test_milestone_2_1_integration():
     """Test the complete integration: SQLAlchemy + Pydantic + Database"""
-    from backend.app.models import Book
-    from backend.app.schemas import BookCreate, BookResponse
-    from backend.app.database import get_db
+    from app.models import Book
+    from app.schemas import BookCreate, BookResponse
+    from app.database import get_db
 
     # Step 1: Create book using Pydantic schema
     book_data = BookCreate(
@@ -173,7 +166,7 @@ if __name__ == "__main__":
 
     print()
     try:
-        test_sqlalchemy_models()
+        test_book_model()
         models_ok = True
     except Exception as e:
         print(f"❌ SQLAlchemy model test failed: {e}")

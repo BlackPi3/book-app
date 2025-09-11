@@ -19,8 +19,8 @@ from sqlalchemy import create_engine
 # sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import using absolute imports to avoid relative import issues
-from backend.app.models import Book
-from backend.app.database import DATABASE_URL
+from app.models import Book
+from app.database import DATABASE_URL
 
 def test_migration_system():
     """Test that the Alembic migration system is working correctly."""

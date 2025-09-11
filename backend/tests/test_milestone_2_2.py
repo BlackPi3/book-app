@@ -6,7 +6,7 @@ This script tests all CRUD operations and Repository Pattern principles.
 
 def test_repository_interface():
     """Test that the abstract interface is properly defined"""
-    from backend.app.repositories import BookRepositoryInterface
+    from app.repositories import BookRepositoryInterface
     from abc import ABC
 
     # Verify it's an abstract base class
@@ -26,13 +26,13 @@ def test_repository_interface():
 
 def test_dependency_inversion_principle():
     """Test that the Repository Pattern follows Dependency Inversion Principle"""
-    from backend.app.repositories import BookRepositoryInterface, SQLBookRepository
+    from app.repositories import BookRepositoryInterface, SQLBookRepository
 
     # Verify SQLBookRepository implements the interface
     assert issubclass(SQLBookRepository, BookRepositoryInterface)
 
     # Test that we can treat SQLBookRepository as BookRepositoryInterface
-    from backend.app.database import get_db
+    from app.database import get_db
     db = next(get_db())
 
     # This demonstrates Dependency Inversion - we depend on abstraction
@@ -50,9 +50,9 @@ def test_dependency_inversion_principle():
 
 def test_crud_operations():
     """Test all CRUD operations through the repository"""
-    from backend.app.repositories import SQLBookRepository
-    from backend.app.models import Book
-    from backend.app.database import get_db, create_tables
+    from app.repositories import SQLBookRepository
+    from app.models import Book
+    from app.database import get_db, create_tables
 
     # Create tables and get database session
     create_tables()
@@ -102,9 +102,9 @@ def test_crud_operations():
 
 def test_search_functionality():
     """Test search operations"""
-    from backend.app.repositories import SQLBookRepository
-    from backend.app.models import Book
-    from backend.app.database import get_db
+    from app.repositories import SQLBookRepository
+    from app.models import Book
+    from app.database import get_db
 
     db = next(get_db())
     repo = SQLBookRepository(db)
@@ -143,7 +143,7 @@ def test_search_functionality():
 
 def test_repository_benefits():
     """Test the benefits that Repository Pattern provides"""
-    from backend.app.repositories import BookRepositoryInterface
+    from app.repositories import BookRepositoryInterface
 
     # Benefit 1: Easy to switch implementations
     # We could easily create MockBookRepository for testing
@@ -197,7 +197,7 @@ def test_repository_benefits():
             return [b for b in self.books if b.created_by == created_by]
 
     # Test mock repository
-    from backend.app.models import Book
+    from app.models import Book
     mock_repo = MockBookRepository()
 
     # Same interface, different implementation

@@ -19,8 +19,8 @@ from sqlalchemy.orm import sessionmaker
 # Add the backend directory to Python path for imports (parent of tests directory)
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from backend.app.models import Book
-from backend.app.database import engine, test_engine, create_database_engine
+from app.models import Book
+from app.database import engine, test_engine, create_database_engine
 
 def test_database_optimizations():
     """Test that database session management and indexes are optimized"""
@@ -48,7 +48,7 @@ def test_database_optimizations():
         print("   ⚠️  Some database indexes may not be fully applied")
 
     # Test 3: Verify optimized session configuration
-    from backend.app.database import SessionLocal
+    from app.database import SessionLocal
     session = SessionLocal()
     assert session.bind == engine
     session.close()
@@ -93,7 +93,7 @@ def test_database_isolation():
     print("🧪 Testing Database Isolation...")
 
     # Test that we have separate test database configuration
-    from backend.app.database import TEST_DATABASE_URL, DATABASE_URL
+    from app.database import TEST_DATABASE_URL, DATABASE_URL
 
     assert TEST_DATABASE_URL != DATABASE_URL
     print("   ✅ Separate test database configuration")
@@ -111,8 +111,8 @@ def test_performance_improvements():
     print("🧪 Testing Performance Improvements...")
 
     # Test search performance with a small dataset
-    from backend.app.database import SessionLocal
-    from backend.app.repositories.sql_book_repository import SQLBookRepository
+    from app.database import SessionLocal
+    from app.repositories.sql_book_repository import SQLBookRepository
 
     session = SessionLocal()
     repo = SQLBookRepository(session)

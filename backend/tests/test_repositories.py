@@ -16,8 +16,8 @@ Learning Points:
 import pytest
 from sqlalchemy.exc import IntegrityError
 
-from backend.app.models import Book
-from backend.app.repositories.book_repository_interface import BookRepositoryInterface
+from app.models import Book
+from app.repositories.book_repository_interface import BookRepositoryInterface
 
 class TestBookRepository:
     """Test suite for BookRepository CRUD operations"""

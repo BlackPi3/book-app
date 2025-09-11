@@ -12,18 +12,14 @@ Key Patterns:
 """
 
 import pytest
-import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-# Import our application components with proper path setup
-import sys
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from backend.app.models import Base, Book
-from backend.app.repositories.sql_book_repository import SQLBookRepository
-from backend.app.repositories.book_repository_interface import BookRepositoryInterface
+# from models import Base, Book
+from app.models import Base, Book
+from app.repositories.sql_book_repository import SQLBookRepository
+from app.repositories.book_repository_interface import BookRepositoryInterface
 
 @pytest.fixture(scope="function")
 def test_engine():
