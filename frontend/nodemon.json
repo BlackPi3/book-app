@@ -1,0 +1,15 @@
+{
+  "watch": ["webapp"],
+  "ext": "ts,xml,json,html",
+  "ignore": [
+    "**/*.js",
+    "**/*.js.map",
+    "tsconfig.tsbuildinfo",
+    "dist/*",
+    "build/*",
+    "node_modules/*"
+  ],
+  "exec": "npx tsc && npx ui5 serve --port 8080 -o /index.html",
+  "delay": 1000
+}
+

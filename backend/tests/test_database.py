@@ -15,8 +15,6 @@ Learning Points:
 
 import pytest
 import time
-import os
-import sys
 from sqlalchemy import text, inspect
 
 from app.models import Book

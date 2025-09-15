@@ -20,7 +20,7 @@ from sqlalchemy.pool import StaticPool
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.main import app, get_book_repository
-from app.models import Base, Book
+from app.models import Base
 from app.repositories.sql_book_repository import SQLBookRepository
 
 @pytest.fixture(scope="function")

@@ -15,10 +15,10 @@ import os
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 
-# Add the backend directory to Python path for imports (parent of tests directory)
-# sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Add the current directory to Python path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Import using absolute imports to avoid relative import issues
+# Import using relative imports from the app directory
 from app.models import Book
 from app.database import DATABASE_URL
 
@@ -53,7 +53,7 @@ def test_seeding_functionality():
         print(f"   📊 Books in database: {initial_count}")
         
         # Run seeding script
-        result = subprocess.run([sys.executable, 'app/seed.py'], 
+        result = subprocess.run([sys.executable, 'app/seed.py'],
                               capture_output=True, text=True)
         assert result.returncode == 0, f"Seeding failed: {result.stderr}"
 
@@ -105,9 +105,9 @@ def test_milestone_3_1():
         print("🎉 MILESTONE 3.1 COMPLETED SUCCESSFULLY!")
         print("✅ All requirements met:")
         print("   - Alembic migration system set up")
-        print("   - Initial migration created and applied")  
+        print("   - Initial migration created and applied")
         print("   - Database seeding script working")
-        print("   - Migrations and seeds run consistently")
+
         print("   - Database versioning functional")
         assert True
     else:

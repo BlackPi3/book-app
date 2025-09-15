@@ -1,0 +1,1 @@
+{"root":["./webapp/index.ts","./webapp/bookapp/component.ts","./webapp/bookapp/controller/main.controller.ts","./webapp/bookapp/model/models.ts","./webapp/bookapp/model/types.ts","./webapp/bookapp/service/bookservice.ts"],"errors":true,"version":"5.9.2"}

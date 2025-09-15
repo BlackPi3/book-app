@@ -19,8 +19,8 @@ from sqlalchemy import create_engine
 # Add the parent directory to Python path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Import using relative imports - this fixes the import errors
-from models import Book, Base
+# Import using relative imports from the current directory
+from models import Book
 from database import DATABASE_URL
 
 def create_sample_books():

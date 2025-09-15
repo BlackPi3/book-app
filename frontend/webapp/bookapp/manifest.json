@@ -1,0 +1,75 @@
+{
+  "_version": "1.58.0",
+  "sap.app": {
+    "id": "bookapp",
+    "type": "application",
+    "applicationVersion": {
+      "version": "1.0.0"
+    },
+    "title": "BookApp Frontend",
+    "description": "SAPUI5 Frontend for Book Management Application"
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "icons": {
+      "icon": "sap-icon://task"
+    },
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "rootView": {
+      "viewName": "bookapp.view.App",
+      "type": "XML",
+      "async": true
+    },
+    "dependencies": {
+      "minUI5Version": "1.58.0",
+      "libs": {
+        "sap.ui.core": {},
+        "sap.m": {},
+        "sap.ui.table": {}
+      }
+    },
+    "models": {
+      "": {
+        "dataSource": "mainService",
+        "type": "sap.ui.model.json.JSONModel"
+      }
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "viewType": "XML",
+        "async": true,
+        "viewPath": "bookapp.view",
+        "controlAggregation": "pages",
+        "controlId": "app",
+        "clearControlAggregation": false
+      },
+      "routes": [
+        {
+          "name": "main",
+          "pattern": "",
+          "target": ["main"]
+        }
+      ],
+      "targets": {
+        "main": {
+          "viewType": "XML",
+          "viewName": "Main"
+        }
+      }
+    }
+  },
+  "sap.app/dataSources": {
+    "mainService": {
+      "uri": "http://localhost:8000/",
+      "type": "REST"
+    }
+  }
+}
+
