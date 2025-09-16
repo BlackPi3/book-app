@@ -16,7 +16,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-# from models import Base, Book
 from app.models import Base, Book
 from app.repositories.sql_book_repository import SQLBookRepository
 from app.repositories.book_repository_interface import BookRepositoryInterface
@@ -49,6 +48,7 @@ def test_engine():
 
     # Cleanup happens automatically with in-memory database
 
+
 @pytest.fixture(scope="function")
 def test_session(test_engine):
     """
@@ -72,27 +72,51 @@ def test_session(test_engine):
     # Cleanup: Close session
     session.close()
 
+
+@pytest.fixture(scope="function")
+def test_db(test_engine):
+    """
+    Create a test database fixture for database isolation testing.
+
+    This fixture provides access to the test database engine
+    and ensures proper cleanup after each test.
+    """
+    yield test_engine
+
+
+@pytest.fixture(scope="function")
+def book_repository(test_session) -> BookRepositoryInterface:
+    """
+    Create a book repository instance for testing.
+
+    This demonstrates the Repository pattern in testing:
+    - Uses test database session for isolation
+    - Returns interface type for flexibility
+    - Automatic cleanup via session fixture
+    """
+    return SQLBookRepository(test_session)
+
+
 @pytest.fixture(scope="function")
 def test_repository(test_session) -> BookRepositoryInterface:
     """
-    Create a repository instance for testing.
+    Create a test repository fixture for repository testing.
 
-    This demonstrates the Dependency Injection pattern in tests:
-    - Repository depends on database session
-    - Test provides controlled session
-    - Easy to verify repository behavior
+    This is an alias for book_repository to maintain compatibility
+    with existing repository tests.
     """
     return SQLBookRepository(test_session)
+
 
 @pytest.fixture
 def sample_book_data():
     """
-    Factory fixture for creating sample book data.
+    Provide sample book data for testing.
 
-    This demonstrates the Test Data Factory pattern:
-    - Centralized test data creation
+    This demonstrates the Factory pattern for test data:
     - Consistent test data across tests
-    - Easy to modify test scenarios
+    - Easy to modify for different test scenarios
+    - Reusable across multiple test files
     """
     return {
         "title": "Test Driven Development",
@@ -100,10 +124,12 @@ def sample_book_data():
         "created_by": "test_user"
     }
 
+
 @pytest.fixture
 def sample_book(sample_book_data):
     """Create a Book model instance from sample data"""
     return Book(**sample_book_data)
+
 
 @pytest.fixture
 def multiple_sample_books():
@@ -138,6 +164,7 @@ def multiple_sample_books():
         }
     ]
 
+
 @pytest.fixture
 def create_test_books(test_session):
     """
@@ -147,7 +174,7 @@ def create_test_books(test_session):
     - Creates multiple books at once
     - Commits to database
     - Returns created book instances
-    
+
     Usage:
         def test_something(create_test_books):
             books = create_test_books([
@@ -158,7 +185,7 @@ def create_test_books(test_session):
 
     Args:
         book_data_list: List of dictionaries containing book data
-        
+
     Returns:
         Function that takes book_data_list and returns List of created Book instances
     """
