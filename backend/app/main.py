@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from contextlib import asynccontextmanager
@@ -21,6 +22,19 @@ app = FastAPI(
     description="A REST API for managing books with Repository Pattern and Dependency Injection",
     version="1.0.0",
     lifespan=lifespan
+)
+
+# CORS configuration (explicit origins to satisfy browser security)
+ALLOWED_ORIGINS = [
+    "http://localhost:8080",
+    "http://127.0.0.1:8080"
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Dependency Injection: Repository Factory

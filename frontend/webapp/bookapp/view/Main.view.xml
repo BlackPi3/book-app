@@ -1,144 +1,120 @@
 <mvc:View
-    controllerName="bookapp.controller.Main"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns:core="sap.ui.core"
-    xmlns="sap.m"
-    displayBlock="true">
-    <Page id="page" title="BookApp - Connected to FastAPI Backend">
+        controllerName="bookapp.controller.Main"
+        xmlns:mvc="sap.ui.core.mvc"
+        xmlns="sap.m"
+        xmlns:core="sap.ui.core">
+
+    <Page id="page" title="Book Management System" class="sapUiResponsiveMargin">
         <content>
-            <VBox class="sapUiMediumMargin">
-                <MessageStrip
-                    text="Welcome to BookApp! Now connected to your FastAPI backend - all operations work with real data."
-                    type="Success"
-                    class="sapUiMediumMarginBottom"/>
-
-                <Panel headerText="Book Management" class="sapUiResponsiveMargin">
-                    <content>
-                        <VBox>
-                            <HBox class="sapUiMediumMarginBottom">
-                                <Button
-                                    text="Add Sample Book"
-                                    type="Emphasized"
-                                    press="onAddBook"
-                                    icon="sap-icon://add"
-                                    enabled="{= !${/isLoading} }"/>
-                                <SearchField
-                                    id="searchField"
-                                    width="300px"
-                                    placeholder="Search books by title..."
-                                    search="onSearch"
-                                    enabled="{= !${/isLoading} }"
-                                    class="sapUiMediumMarginBegin"/>
-                                <core:Icon
-                                    src="sap-icon://synchronize"
-                                    class="sapUiMediumMarginBegin sapUiMediumMarginTop"
-                                    visible="{/isLoading}"/>
-                            </HBox>
-
-                            <Table
-                                id="booksTable"
-                                items="{/books}"
-                                growing="true"
-                                growingThreshold="20"
-                                busy="{/isLoading}">
-                                <headerToolbar>
-                                    <Toolbar>
-                                        <Title text="Books ({/books/length}) - Real API Data"/>
-                                        <ToolbarSpacer/>
-                                        <Text text="{= ${/isLoading} ? 'Loading...' : 'Ready' }" class="sapUiTinyMarginEnd"/>
-                                    </Toolbar>
-                                </headerToolbar>
-                                <columns>
-                                    <Column>
-                                        <Text text="Title"/>
-                                    </Column>
-                                    <Column>
-                                        <Text text="Author"/>
-                                    </Column>
-                                    <Column>
-                                        <Text text="Created On"/>
-                                    </Column>
-                                    <Column>
-                                        <Text text="Created By"/>
-                                    </Column>
-                                    <Column>
-                                        <Text text="Actions"/>
-                                    </Column>
-                                </columns>
-                                <items>
-                                    <ColumnListItem>
-                                        <cells>
-                                            <Text text="{title}"/>
-                                            <Text text="{author}"/>
-                                            <Text text="{created_on}"/>
-                                            <Text text="{created_by}"/>
-                                            <HBox>
-                                                <Button
-                                                    icon="sap-icon://edit"
-                                                    type="Transparent"
-                                                    press="onEditBook"
-                                                    enabled="{= !${/isLoading} }"
-                                                    tooltip="Quick Edit (adds 'Updated' to title)"/>
-                                                <Button
-                                                    icon="sap-icon://delete"
-                                                    type="Transparent"
-                                                    press="onDeleteBook"
-                                                    enabled="{= !${/isLoading} }"
-                                                    tooltip="Delete Book"/>
-                                            </HBox>
-                                        </cells>
-                                    </ColumnListItem>
-                                </items>
-                            </Table>
-                        </VBox>
-                    </content>
-                </Panel>
-
-                <Panel headerText="API Integration Status" class="sapUiResponsiveMargin">
-                    <content>
-                        <VBox class="sapUiSmallMargin">
-                            <Text text="✅ Frontend-Backend Integration Complete"/>
-                            <Text text="✅ All CRUD operations working with real API"/>
-                            <Text text="✅ Professional dialog forms with validation"/>
-                            <Text text="✅ Search functionality connected"/>
-                            <Text text="✅ Error handling implemented"/>
-                            <Text text="✅ Loading states and user feedback active"/>
-                            <Text text="✅ Delete confirmation dialogs working"/>
-                        </VBox>
-                    </content>
-                </Panel>
-
-                <Panel headerText="User Experience Features" class="sapUiResponsiveMargin">
-                    <content>
-                        <VBox class="sapUiSmallMargin">
-                            <MessageStrip
-                                text="Your BookApp now has enterprise-grade user experience with professional forms, validation, and error handling!"
-                                type="Success"
-                                class="sapUiMediumMarginBottom"/>
-
-                            <HBox class="sapUiSmallMarginTop">
-                                <Button
-                                    text="Test Create Book"
-                                    type="Emphasized"
-                                    press="onAddBook"
-                                    icon="sap-icon://add"
-                                    class="sapUiTinyMarginEnd"/>
-                                <Button
-                                    text="Refresh Data"
-                                    type="Default"
-                                    press="onRefreshData"
-                                    icon="sap-icon://refresh"
-                                    class="sapUiTinyMarginEnd"/>
-                                <Button
-                                    text="Clear Search"
-                                    type="Default"
-                                    press="onClearSearch"
-                                    icon="sap-icon://clear-filter"/>
-                            </HBox>
-                        </VBox>
-                    </content>
-                </Panel>
+            <VBox>
+                <Text text="UI5 baseline OK"/>
             </VBox>
+            <!--            &lt;!&ndash; Header with action buttons &ndash;&gt;-->
+            <!--            <Bar class="sapUiMediumMargin">-->
+            <!--                <contentLeft>-->
+            <!--                    <Title text="Book Library" level="H2"/>-->
+            <!--                </contentLeft>-->
+            <!--                <contentRight>-->
+            <!--                    <Button id="addBookBtn" text="Add New Book" type="Emphasized" -->
+            <!--                            icon="sap-icon://add" press="onAddBook"/>-->
+            <!--                    <Button id="refreshBtn" text="Refresh" icon="sap-icon://refresh" -->
+            <!--                            press="onRefresh"/>-->
+            <!--                </contentRight>-->
+            <!--            </Bar>-->
+
+            <!--            &lt;!&ndash; Search and Filter Controls &ndash;&gt;-->
+            <!--            <Panel headerText="Search &amp; Filter" expandable="true" expanded="true"-->
+            <!--                   class="sapUiResponsiveMargin">-->
+            <!--                <content>-->
+            <!--                    <VBox class="sapUiMediumMargin">-->
+            <!--                        <HBox class="sapUiTinyMargin">-->
+            <!--                            <SearchField id="searchField" width="300px" -->
+            <!--                                       placeholder="Search by title or author..."-->
+            <!--                                       search="onSearch" value="{/searchQuery}"/>-->
+            <!--                            <Button text="Clear" press="onClearSearch" class="sapUiTinyMarginBegin"/>-->
+            <!--                        </HBox>-->
+            <!--                        <HBox class="sapUiTinyMargin">-->
+            <!--                            <Label text="Filter by Author:" class="sapUiTinyMarginEnd"/>-->
+            <!--                            <ComboBox id="authorFilter" width="200px" -->
+            <!--                                    items="{/authors}"-->
+            <!--                                    selectedKey="{/selectedAuthor}"-->
+            <!--                                    selectionChange="onAuthorFilter">-->
+            <!--                                <core:Item key="{key}" text="{text}"/>-->
+            <!--                            </ComboBox>-->
+            <!--                        </HBox>-->
+            <!--                    </VBox>-->
+            <!--                </content>-->
+            <!--            </Panel>-->
+
+            <!--            &lt;!&ndash; Books Table &ndash;&gt;-->
+            <!--            <Table id="booksTable" -->
+            <!--                   items="{/books}" -->
+            <!--                   growing="true"-->
+            <!--                   growingThreshold="20"-->
+            <!--                   mode="MultiSelect"-->
+            <!--                   class="sapUiResponsiveMargin">-->
+            <!--                <headerToolbar>-->
+            <!--                    <OverflowToolbar>-->
+            <!--                        <Title text="Books ({/totalBooks})"/>-->
+            <!--                        <ToolbarSpacer/>-->
+            <!--                        <Button id="deleteSelectedBtn" text="Delete Selected" -->
+            <!--                                icon="sap-icon://delete" type="Transparent"-->
+            <!--                                enabled="{= ${/selectedBooks}.length > 0}"-->
+            <!--                                press="onDeleteSelected"/>-->
+            <!--                    </OverflowToolbar>-->
+            <!--                </headerToolbar>-->
+            <!--                -->
+            <!--                <columns>-->
+            <!--                    <Column width="12em">-->
+            <!--                        <Text text="Title"/>-->
+            <!--                    </Column>-->
+            <!--                    <Column width="12em">-->
+            <!--                        <Text text="Author"/>-->
+            <!--                    </Column>-->
+            <!--                    <Column width="10em">-->
+            <!--                        <Text text="Created Date"/>-->
+            <!--                    </Column>-->
+            <!--                    <Column width="8em">-->
+            <!--                        <Text text="Created By"/>-->
+            <!--                    </Column>-->
+            <!--                    <Column width="8em">-->
+            <!--                        <Text text="Actions"/>-->
+            <!--                    </Column>-->
+            <!--                </columns>-->
+            <!--                -->
+            <!--                <items>-->
+            <!--                    <ColumnListItem press="onBookPress" type="Navigation">-->
+            <!--                        <cells>-->
+            <!--                            <Text text="{title}" maxLines="2"/>-->
+            <!--                            <Text text="{author}"/>-->
+            <!--                            <Text text="{-->
+            <!--                                path: 'created_on',-->
+            <!--                                type: 'sap.ui.model.type.Date',-->
+            <!--                                formatOptions: {-->
+            <!--                                    style: 'short'-->
+            <!--                                }-->
+            <!--                            }"/>-->
+            <!--                            <Text text="{created_by}"/>-->
+            <!--                            <HBox>-->
+            <!--                                <Button icon="sap-icon://edit" type="Transparent" -->
+            <!--                                        tooltip="Edit Book" press="onEditBook"/>-->
+            <!--                                <Button icon="sap-icon://delete" type="Transparent" -->
+            <!--                                        tooltip="Delete Book" press="onDeleteBook"/>-->
+            <!--                            </HBox>-->
+            <!--                        </cells>-->
+            <!--                    </ColumnListItem>-->
+            <!--                </items>-->
+            <!--            </Table>-->
+
+            <!--            &lt;!&ndash; Loading indicator &ndash;&gt;-->
+            <!--            <BusyIndicator id="loadingIndicator" visible="{/loading}" size="2rem"/>-->
+            <!--            -->
+            <!--            &lt;!&ndash; No data message &ndash;&gt;-->
+            <!--            <MessageStrip id="noDataMessage" -->
+            <!--                         text="No books found. Click 'Add New Book' to get started."-->
+            <!--                         type="Information"-->
+            <!--                         visible="{= ${/books}.length === 0 && !${/loading}}"-->
+            <!--                         class="sapUiMediumMargin"/>-->
         </content>
     </Page>
 </mvc:View>

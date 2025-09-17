@@ -1,6 +1,10 @@
 <mvc:View
+    controllerName="bookapp.controller.App"
     xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m"
-    displayBlock="true">
-    <App id="app"/>
+    xmlns="sap.m">
+    <Shell id="shell">
+        <App id="app" class="sapUiResponsiveMargin">
+            <!-- Pages will be added here by the router -->
+        </App>
+    </Shell>
 </mvc:View>

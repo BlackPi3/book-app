@@ -1,45 +1,19 @@
 {
   "_version": "1.58.0",
   "sap.app": {
-    "id": "bookapp",
+    "id": "bookapp-frontend",
     "type": "application",
-    "applicationVersion": {
-      "version": "1.0.0"
-    },
-    "title": "BookApp Frontend",
-    "description": "SAPUI5 Frontend for Book Management Application"
+    "applicationVersion": { "version": "1.0.0" },
+    "title": "BookApp Frontend (Root Placeholder)",
+    "description": "Root manifest required by UI5 tooling. Actual component manifest is in bookapp/manifest.json"
   },
   "sap.ui": {
-    "technology": "UI5",
-    "icons": {
-      "icon": "sap-icon://task"
-    },
-    "deviceTypes": {
-      "desktop": true,
-      "tablet": true,
-      "phone": true
-    }
+    "technology": "UI5"
   },
   "sap.ui5": {
     "dependencies": {
       "minUI5Version": "1.58.0",
-      "libs": {
-        "sap.ui.core": {},
-        "sap.m": {},
-        "sap.ui.table": {}
-      }
-    },
-    "models": {
-      "": {
-        "dataSource": "mainService",
-        "type": "sap.ui.model.json.JSONModel"
-      }
-    }
-  },
-  "sap.app/dataSources": {
-    "mainService": {
-      "uri": "http://localhost:8000/",
-      "type": "REST"
+      "libs": {"sap.ui.core": {}, "sap.m": {}}
     }
   }
 }

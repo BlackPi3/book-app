@@ -8,8 +8,8 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@ui5/cli": "^3.0.0",
     "@types/openui5": "^1.140.0",
+    "@ui5/cli": "^3.11.11",
     "typescript": "^5.0.0",
     "ui5-tooling-transpile": "^3.9.1"
   },

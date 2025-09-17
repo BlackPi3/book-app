@@ -1,0 +1,112 @@
+/* BookApp CSS Styles */
+
+/* Global Styles */
+.bookapp {
+    font-family: "72", "72full", Arial, Helvetica, sans-serif;
+}
+
+/* Header Styles */
+.bookapp-header {
+    background-color: #0070f2;
+    color: white;
+    padding: 1rem;
+}
+
+.bookapp-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Table Styles */
+.bookapp-table {
+    margin-top: 1rem;
+}
+
+.bookapp-table .sapMListTblRow:hover {
+    background-color: #f5f5f5;
+}
+
+/* Button Styles */
+.bookapp-action-button {
+    margin: 0.25rem;
+}
+
+.bookapp-primary-button {
+    background-color: #0070f2;
+    border-color: #0070f2;
+}
+
+/* Dialog Styles */
+.bookapp-dialog .sapMDialogSection {
+    padding: 1rem;
+}
+
+.bookapp-dialog .sapMLabel {
+    margin-bottom: 0.25rem;
+    font-weight: bold;
+}
+
+.bookapp-dialog .sapMInput {
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+/* Search Panel Styles */
+.bookapp-search-panel {
+    background-color: #fafafa;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+}
+
+.bookapp-search-controls {
+    padding: 1rem;
+}
+
+/* Loading Styles */
+.bookapp-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .bookapp-table .sapMListTblCell {
+        padding: 0.5rem 0.25rem;
+    }
+    
+    .bookapp-search-controls .sapMHBox {
+        flex-direction: column;
+    }
+    
+    .bookapp-search-controls .sapMSearchField {
+        width: 100% !important;
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Status Message Styles */
+.bookapp-no-data {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+}
+
+.bookapp-error-message {
+    background-color: #fee;
+    border: 1px solid #fcc;
+    color: #c33;
+    padding: 1rem;
+    border-radius: 4px;
+    margin: 1rem 0;
+}
+
+.bookapp-success-message {
+    background-color: #efe;
+    border: 1px solid #cfc;
+    color: #3c3;
+    padding: 1rem;
+    border-radius: 4px;
+    margin: 1rem 0;
+}

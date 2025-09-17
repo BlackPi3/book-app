@@ -1,6 +1,29 @@
-import { IBook, IBookCreate, IBookUpdate, IBookResponse, IApiResponse, IBookSearchParams } from "../model/types";
+/**
+ * BookService - Handles all API communication with the backend
+ * 
+ * This service class demonstrates:
+ * - Separation of concerns (API logic separate from UI logic)
+ * - Promise-based async operations
+ * - Error handling patterns
+ * - RESTful API integration
+ */
 
-export class BookService {
+export interface Book {
+    id?: number;
+    title: string;
+    author: string;
+    created_by: string;
+    created_on?: string;
+}
+
+export interface BookSearchParams {
+    search?: string;
+    author?: string;
+    limit?: number;
+    offset?: number;
+}
+
+export default class BookService {
     private baseUrl: string;
 
     constructor(baseUrl: string = "http://localhost:8000") {
@@ -8,135 +31,114 @@ export class BookService {
     }
 
     /**
-     * Fetch all books from the API
+     * Fetch all books with optional filtering
      */
-    async getAllBooks(): Promise<IApiResponse<IBookResponse[]>> {
-        try {
-            const response = await fetch(`${this.baseUrl}/books`);
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+    async getBooks(params?: BookSearchParams): Promise<Book[]> {
+        let url = `${this.baseUrl}/books`;
+        
+        if (params) {
+            const searchParams = new URLSearchParams();
+            if (params.search) searchParams.append("search", params.search);
+            if (params.author) searchParams.append("author", params.author);
+            if (params.limit) searchParams.append("limit", params.limit.toString());
+            if (params.offset) searchParams.append("offset", params.offset.toString());
+            
+            const queryString = searchParams.toString();
+            if (queryString) {
+                url += `?${queryString}`;
             }
-
-            const data = await response.json();
-            return { data };
-        } catch (error) {
-            console.error("Error fetching books:", error);
-            return { error: "Failed to fetch books" };
         }
-    }
 
-    /**
-     * Create a new book
-     */
-    async createBook(book: IBookCreate): Promise<IApiResponse<IBookResponse>> {
-        try {
-            const response = await fetch(`${this.baseUrl}/books`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(book),
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            return { data };
-        } catch (error) {
-            console.error("Error creating book:", error);
-            return { error: "Failed to create book" };
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch books: ${response.status} ${response.statusText}`);
         }
-    }
-
-    /**
-     * Update an existing book
-     */
-    async updateBook(id: number, book: IBookUpdate): Promise<IApiResponse<IBookResponse>> {
-        try {
-            const response = await fetch(`${this.baseUrl}/books/${id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(book),
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            return { data };
-        } catch (error) {
-            console.error("Error updating book:", error);
-            return { error: "Failed to update book" };
-        }
-    }
-
-    /**
-     * Delete a book
-     */
-    async deleteBook(id: number): Promise<IApiResponse<void>> {
-        try {
-            const response = await fetch(`${this.baseUrl}/books/${id}`, {
-                method: "DELETE",
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            return { message: "Book deleted successfully" };
-        } catch (error) {
-            console.error("Error deleting book:", error);
-            return { error: "Failed to delete book" };
-        }
-    }
-
-    /**
-     * Search books by parameters
-     */
-    async searchBooks(params: IBookSearchParams): Promise<IApiResponse<IBookResponse[]>> {
-        try {
-            const queryParams = new URLSearchParams();
-
-            if (params.title) queryParams.append("title", params.title);
-            if (params.author) queryParams.append("author", params.author);
-            if (params.created_by) queryParams.append("created_by", params.created_by);
-
-            const response = await fetch(`${this.baseUrl}/books?${queryParams.toString()}`);
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            return { data };
-        } catch (error) {
-            console.error("Error searching books:", error);
-            return { error: "Failed to search books" };
-        }
+        
+        return response.json();
     }
 
     /**
      * Get a single book by ID
      */
-    async getBookById(id: number): Promise<IApiResponse<IBookResponse>> {
+    async getBook(id: number): Promise<Book> {
+        const response = await fetch(`${this.baseUrl}/books/${id}`);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch book: ${response.status} ${response.statusText}`);
+        }
+        
+        return response.json();
+    }
+
+    /**
+     * Create a new book
+     */
+    async createBook(book: Book): Promise<Book> {
+        const response = await fetch(`${this.baseUrl}/books`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(book)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(`Failed to create book: ${response.status} ${response.statusText}. ${errorData.detail || ""}`);
+        }
+        
+        return response.json();
+    }
+
+    /**
+     * Update an existing book
+     */
+    async updateBook(id: number, book: Book): Promise<Book> {
+        const response = await fetch(`${this.baseUrl}/books/${id}`, {
+            method: "PUT", 
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(book)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(`Failed to update book: ${response.status} ${response.statusText}. ${errorData.detail || ""}`);
+        }
+        
+        return response.json();
+    }
+
+    /**
+     * Delete a book by ID
+     */
+    async deleteBook(id: number): Promise<void> {
+        const response = await fetch(`${this.baseUrl}/books/${id}`, {
+            method: "DELETE"
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to delete book: ${response.status} ${response.statusText}`);
+        }
+    }
+
+    /**
+     * Delete multiple books
+     */
+    async deleteBooks(ids: number[]): Promise<void> {
+        const deletePromises = ids.map(id => this.deleteBook(id));
+        await Promise.all(deletePromises);
+    }
+
+    /**
+     * Check if the backend API is available
+     */
+    async healthCheck(): Promise<boolean> {
         try {
-            const response = await fetch(`${this.baseUrl}/books/${id}`);
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            return { data };
+            const response = await fetch(`${this.baseUrl}/`);
+            return response.ok;
         } catch (error) {
-            console.error("Error fetching book:", error);
-            return { error: "Failed to fetch book" };
+            return false;
         }
     }
 }

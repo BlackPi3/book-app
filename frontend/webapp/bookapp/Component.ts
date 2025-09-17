@@ -22,7 +22,11 @@ export default class Component extends UIComponent {
         // set the device model
         this.setModel(models.createDeviceModel(), "device");
 
-        // create the views based on the url/hash
-        this.getRouter().initialize();
+        // Routing disabled (no routing section in manifest) – removed getRouter().initialize()
+        // console.log for debug
+        // @ts-ignore
+        window.__BOOKAPP_INIT__ = true;
+        // eslint-disable-next-line no-console
+        console.log("BookApp Component init completed (no router)");
     }
 }

@@ -4,10 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BookApp - SAPUI5 Frontend</title>
+    
+    <!-- Link to custom CSS styling -->
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    
     <script id="sap-ui-bootstrap"
             src="resources/sap-ui-core.js"
-            data-sap-ui-libs="sap.m,sap.ui.core"
-            data-sap-ui-theme="sap_horizon"
+            data-sap-ui-libs="sap.m,sap.ui.core,sap.ui.table"
+            data-sap-ui-theme="sap_fiori_3"
             data-sap-ui-resourceroots='{"bookapp":"./bookapp/"}'
             data-sap-ui-async="true"
             data-sap-ui-compatVersion="edge">
@@ -15,10 +19,11 @@
 </head>
 <body class="sapUiBody" id="content">
 <script>
-    sap.ui.getCore().attachInit(function () {
-        sap.ui.require([
-            "sap/ui/core/ComponentContainer"
-        ], function (ComponentContainer) {
+    sap.ui.require([
+        "sap/ui/core/Core",
+        "sap/ui/core/ComponentContainer"
+    ], function (Core, ComponentContainer) {
+        Core.ready().then(function () {
             new ComponentContainer({
                 name: "bookapp",
                 async: true,
