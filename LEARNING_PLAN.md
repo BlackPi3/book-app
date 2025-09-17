@@ -210,6 +210,30 @@ curl -X GET "http://localhost:8000/books?title=API"
 
 ---
 
+## 📋 MILESTONE 2.4: Service Layer & Modular API Refactor (Added Post-Planning)
+**Due**: Added after initial milestones | **Estimated Time**: 2 hours
+
+### ✅ Completion Criteria
+- [ ] BookService implemented in `services/book_service.py`
+- [ ] API endpoints refactored into `api/books.py` using `APIRouter`
+- [ ] Dependency providers centralized in `api/dependencies.py`
+- [ ] Endpoints consume service instead of repository directly
+- [ ] All existing tests pass unchanged
+
+### 🧠 Knowledge Check
+1. Why introduce a service layer if the repository already abstracts persistence?
+2. How does moving endpoints into a router improve maintainability?
+3. What future cross-cutting concerns can the service layer host?
+
+### 🔬 Test Your Implementation
+```bash
+pytest backend/tests/test_api.py -q
+```
+All tests should pass with no path changes.
+
+### ✅ **MILESTONE 2.4 COMPLETE** ☐
+
+---
 # 🗄️ PHASE 3: Database & Data Layer (Days 6-7)
 
 ## 📋 MILESTONE 3.1: Database Migrations & Seeding
@@ -488,7 +512,7 @@ docker compose logs
 
 # 🎯 Milestone Progress Tracker
 
-## Overall Progress: 42% Complete
+## Overall Progress: 46% Complete
 
 ### Phase 1: Foundation & Architecture
 - [x] Milestone 1.1: Project Structure Setup
@@ -498,6 +522,7 @@ docker compose logs
 - [x] Milestone 2.1: Data Layer Implementation
 - [x] Milestone 2.2: Repository Pattern Implementation
 - [x] Milestone 2.3: API Layer & FastAPI Setup
+- [x] Milestone 2.4: Service Layer & Modular API Refactor
 
 ### Phase 3: Database & Data Layer
 - [x] Milestone 3.1: Database Migrations & Seeding

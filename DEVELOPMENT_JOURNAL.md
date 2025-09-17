@@ -80,7 +80,7 @@ Designed 3-layer architecture with clear boundaries:
 │   Presentation  │ ← API endpoints, HTTP handling
 ├─────────────────┤
 │    Business     │ ← Services, validation, business rules
-├─────────────────┤
+├──────────��──────┤
 │      Data       │ ← Models, repositories, database access
 └─────────────────┘
 ```
@@ -234,146 +234,50 @@ async def create_book(
 
 ---
 
-## 🗄️ PHASE 3: Database & Data Layer
+### 📝 Entry 2.4: Service Layer Introduction & Modular API Refactor
+**Date**: Implementation Day 10
 
-### 📝 Entry 3.1: Database Migrations & Seeding
-**Date**: Implementation Day 6
+**🔴 PROBLEM**:
+- Endpoints were directly orchestrating repository operations (thin HTTP ↔ data coupling)
+- Harder to evolve business rules without touching presentation layer
+- All endpoints kept in main.py reducing modularity and test clarity
 
-**🔴 PROBLEM**: 
-- Database schema changes are manual and error-prone
-- Team members have different database structures
-- No way to rollback database changes
-- Production deployments risk data loss
-- Need sample data for development/testing
+**🔵 WHAT**:
+- Introduced dedicated `BookService` encapsulating business logic and orchestration
+- Added `app/api/books.py` with an `APIRouter` to modularize book endpoints
+- Centralized dependency providers in `app/api/dependencies.py`
+- Refactored endpoints to depend on service instead of repository directly
 
-**🔵 WHAT**: 
-Implemented Alembic migration system and database seeding:
-- Migration versioning system
-- Automatic schema change detection
-- Sample data seeding script
-- Upgrade/downgrade capabilities
+**🟢 WHY**:
+- **Separation of Concerns**: HTTP layer now delegates logic to service
+- **Extensibility**: Future rules (validation, events, caching) go into service without touching controllers
+- **Testability**: Service can be unit tested independently (next planned enhancement)
+- **Maintainability**: Cleaner `main.py`, easier to add more resource routers later
+- **Alignment with Layered Architecture**: Restores clear Presentation → Business → Data flow
 
-**🟢 WHY - Migration Pattern**: 
-Even for solo projects, migrations are essential because:
-- **Version Control**: Track database changes like code changes
-- **Reproducibility**: Same database structure across environments
-- **Deployment Safety**: Automated, tested database updates
-- **Professional Practice**: Industry standard for database management
-- **Future-Proofing**: When you do work with teams, you'll know the pattern
-
-**🟢 WHY - Seeding Pattern**: 
-- **Development Efficiency**: Don't manually create test data
-- **Consistent Testing**: Same sample data for all developers
-- **Demo Readiness**: Application works immediately with realistic data
-
-**🟡 HOW**: 
+**🟡 HOW**:
 ```python
-# Migration (schema change)
-def upgrade():
-    op.create_table('books',
-        sa.Column('id', sa.Integer(), primary_key=True),
-        sa.Column('title', sa.String(), nullable=False),
-        sa.Column('author', sa.String(), nullable=False)
-    )
+# Dependency (dependencies.py)
+def get_book_service(repo: BookRepositoryInterface = Depends(get_book_repository)) -> BookService:
+    return BookService(repo)
 
-# Seeding (sample data)
-def seed_database():
-    books = [Book(title="Clean Code", author="Robert Martin"), ...]
-    for book in books:
-        db.add(book)
-    db.commit()
+# Service (book_service.py)
+class BookService:
+    def search_books(...):
+        if filters: return repo.search(...)
+        return repo.get_all(...)
+
+# Router (books.py)
+@router.get('/books')
+async def get_books(..., service: BookService = Depends(get_book_service)):
+    return service.search_books(...)
 ```
 
 **📊 Learning Outcomes**:
-- Understood migration pattern for database versioning
-- Learned difference between schema changes (migrations) and data population (seeding)
-- Practiced professional database management workflows
-
----
-
-### 📝 Entry 3.2: Advanced Database Patterns & Testing
-**Date**: Implementation Day 7
-
-**🔴 PROBLEM**: 
-- Database performance can degrade without proper indexing
-- Production bugs often come from untested database operations
-- Tests interfere with each other when sharing database state
-- Session management inefficiencies can cause memory leaks
-- No way to measure database operation performance
-
-**🔵 WHAT**: 
-Implementing advanced database optimization and testing patterns:
-- Database indexes for commonly queried fields
-- Isolated test database setup
-- Comprehensive unit tests for repository layer
-- Session management optimization
-- Performance testing and monitoring
-
-**🟢 WHY - Database Indexes**: 
-- **Performance**: Dramatically speed up search operations
-- **Scalability**: Essential when dataset grows large
-- **User Experience**: Faster response times for API calls
-- **Cost Efficiency**: Reduce server resource usage
-
-**🟢 WHY - Test Database Isolation**: 
-- **Reliability**: Tests don't interfere with each other
-- **Consistency**: Same test results every time
-- **Safety**: Can't accidentally damage development data
-- **Speed**: Tests run faster with clean, minimal data
-
-**🟢 WHY - Comprehensive Testing**: 
-- **Quality Assurance**: Catch bugs before production
-- **Refactoring Safety**: Change code with confidence
-- **Documentation**: Tests show how code should work
-- **Team Collaboration**: New developers understand expected behavior
-
-**🟡 HOW - Database Indexes**: 
-```python
-# Add indexes to frequently searched columns
-class Book(Base):
-    __tablename__ = "books"
-    
-    title = Column(String, nullable=False, index=True)  # Index for title searches
-    author = Column(String, nullable=False, index=True)  # Index for author searches
-    created_by = Column(String, nullable=False, index=True)  # Index for creator searches
-```
-
-**🟡 HOW - Test Database Isolation**: 
-```python
-# Separate test database configuration
-TEST_DATABASE_URL = "sqlite:///./test_books.db"
-
-# Test fixtures that create/cleanup database
-@pytest.fixture
-def test_db():
-    # Create test database
-    engine = create_engine(TEST_DATABASE_URL)
-    Base.metadata.create_all(engine)
-    
-    yield engine
-    
-    # Cleanup after test
-    Base.metadata.drop_all(engine)
-```
-
-**🟡 HOW - Repository Testing**: 
-```python
-# Test all CRUD operations
-def test_create_book(test_db):
-    repo = SQLBookRepository(test_session)
-    book = Book(title="Test", author="Author", created_by="Test")
-    
-    result = repo.create(book)
-    
-    assert result.id is not None
-    assert result.title == "Test"
-```
-
-**📊 Learning Outcomes**:
-- Mastered database indexing for performance optimization
-- Understood test database isolation patterns
-- Learned comprehensive testing strategies for data layer
-- Practiced session management optimization techniques
+- Understood benefits of an explicit service layer over direct repository usage
+- Practiced modular API design with `APIRouter`
+- Strengthened dependency injection chain (DB → Repository → Service → Endpoint)
+- Prepared ground for future cross-cutting concerns (logging, metrics, auth)
 
 ---
 
@@ -574,4 +478,17 @@ class MainController {
 3. **Dependency Injection**: FastAPI and SAPUI5 dependency management
 4. **Error Handling**: Consistent error handling across all layers
 
-**🎯 Project Success**: The BookApp demonstrates professional full-stack development practices suitable for enterprise applications, with clean architecture, comprehensive testing, and modern UI/UX design.
+## 🔜 Upcoming / Planned Enhancements
+(Tracked but not yet implemented, prioritized for practicality.)
+1. Health Endpoint (`/health`): Liveness + optional DB readiness probe
+2. Service Layer Tests: Direct unit tests for `BookService`
+3. Structured Logging: Consistent log formatter + request correlation ID
+4. Error Handling Middleware: Normalize error responses (problem+detail)
+5. Dockerization (Phase 6 milestones) + Postgres switch readiness
+6. Optional API Versioning (`/api/v1`) once stability needed
+7. Pagination Envelope (return total + items) if frontend requires richer metadata
+8. Observability Hooks: Placeholders for metrics (timers on repository calls)
+
+These items remain intentionally separate from core CRUD to keep current scope lean while enabling incremental evolution.
+
+**Current Focus Suggestion**: Implement lightweight `/health` + service unit tests before containerization.
