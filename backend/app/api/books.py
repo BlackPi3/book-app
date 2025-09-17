@@ -57,3 +57,15 @@ async def delete_book(book_id: int, service: BookService = Depends(get_book_serv
     if not success:
         raise HTTPException(status_code=404, detail="Book not found")
     return None
+
+@router.put("/books/{book_id}/", response_model=BookResponse, summary="Update a book (full update)")
+async def update_book(
+        book_id: int,
+        book_update: BookUpdate,
+        service: BookService = Depends(get_book_service)
+):
+    update_data = book_update.model_dump(exclude_unset=True)
+    updated_book = service.update_book(book_id, update_data)
+    if not updated_book:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return updated_book

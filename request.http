@@ -1,0 +1,12 @@
+### GET request to example server
+GET http://localhost:8000/books
+
+### Create a new book
+POST http://localhost:8000/books
+Content-Type: application/json
+
+{
+  "title": "Clean Code",
+  "author": "Robert Martin",
+  "created_by": "admin"
+}

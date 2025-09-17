@@ -11,6 +11,7 @@ sap.ui.define([
             // Initialize the model with empty data
             var oModel = new JSONModel({
                 books: [],
+                _allBooks: [], // keep unfiltered source
                 totalBooks: 0,
                 loading: false,
                 searchQuery: "",
@@ -51,27 +52,10 @@ sap.ui.define([
                             b.created_on = b.created_on.trim();
                         }
                     });
-                    oModel.setProperty("/books", books);
-                    // Diagnostics after setting books
-                    var oTable = that.byId("booksTable");
-                    // eslint-disable-next-line no-console
-                    console.log("[BookApp] diagnostics: table instance=", oTable);
-                    // Delay to allow binding update
-                    setTimeout(function(){
-                        if (oTable) {
-                            // eslint-disable-next-line no-console
-                            console.log("[BookApp] diagnostics: items binding path=", oTable.getBinding("items")?.getPath(), "rendered items=", oTable.getItems().length);
-                        }
-                    },0);
-                    oModel.setProperty("/totalBooks", books.length);
+                    oModel.setProperty("/_allBooks", books);
+                    that._rebuildAuthors(books);
+                    that.applyFilters(); // will set /books + /totalBooks
                     oModel.setProperty("/loading", false);
-                    var authors = [{ key: "", text: "All Authors" }];
-                    var uniqueAuthors = [...new Set(books.map(function(book) { return book.author; }))];
-                    uniqueAuthors.forEach(function(author) { authors.push({ key: author, text: author }); });
-                    oModel.setProperty("/authors", authors);
-                    // eslint-disable-next-line no-console
-                    console.log("[BookApp] loadBooks: model updated, authors=", authors.length);
-                    MessageToast.show("Loaded " + books.length + " books successfully");
                 })
                 .catch(function(error) {
                     // eslint-disable-next-line no-console
@@ -82,11 +66,32 @@ sap.ui.define([
                         { id: 1, title: "Clean Code", author: "Robert Martin", created_by: "demo_user", created_on: new Date().toISOString() },
                         { id: 2, title: "The Pragmatic Programmer", author: "David Thomas", created_by: "demo_user", created_on: new Date().toISOString() }
                     ];
-                    oModel.setProperty("/books", sampleBooks);
-                    oModel.setProperty("/totalBooks", sampleBooks.length);
-                    // eslint-disable-next-line no-console
-                    console.log("[BookApp] loadBooks: fallback sample data applied", sampleBooks);
+                    oModel.setProperty("/_allBooks", sampleBooks);
+                    that._rebuildAuthors(sampleBooks);
+                    that.applyFilters();
                 });
+        },
+
+        _rebuildAuthors: function(books){
+            var oModel = this.getView().getModel();
+            var authors = [{ key: "", text: "All Authors" }];
+            var uniqueAuthors = [...new Set(books.map(function(b){ return b.author; }))];
+            uniqueAuthors.forEach(function(a){ authors.push({ key:a, text:a }); });
+            oModel.setProperty("/authors", authors);
+        },
+
+        applyFilters: function(){
+            var oModel = this.getView().getModel();
+            var all = oModel.getProperty("/_allBooks") || [];
+            var q = (oModel.getProperty("/searchQuery") || "").toLowerCase().trim();
+            var author = oModel.getProperty("/selectedAuthor") || "";
+            var filtered = all.filter(function(b){
+                var okAuthor = !author || b.author === author;
+                var okText = !q || (b.title && b.title.toLowerCase().includes(q)) || (b.author && b.author.toLowerCase().includes(q));
+                return okAuthor && okText;
+            });
+            oModel.setProperty("/books", filtered);
+            oModel.setProperty("/totalBooks", filtered.length);
         },
 
         onRefresh: function () {
@@ -97,22 +102,23 @@ sap.ui.define([
             MessageBox.information("Add Book functionality will be implemented in the next iteration.");
         },
 
-        onSearch: function () {
+        onSearch: function(oEvent){
             var oModel = this.getView().getModel();
-            var searchQuery = oModel.getProperty("/searchQuery");
-            MessageToast.show("Search functionality: " + searchQuery);
+            // search event provides 'query'; liveChange provides 'newValue'
+            var val = oEvent.getParameter("query");
+            if (val === undefined) { val = oEvent.getParameter("newValue"); }
+            if (val !== undefined) { oModel.setProperty("/searchQuery", val); }
+            this.applyFilters();
         },
 
         onClearSearch: function () {
             var oModel = this.getView().getModel();
             oModel.setProperty("/searchQuery", "");
-            this.loadBooks();
+            this.applyFilters();
         },
 
         onAuthorFilter: function () {
-            var oModel = this.getView().getModel();
-            var selectedAuthor = oModel.getProperty("/selectedAuthor");
-            MessageToast.show("Filter by author: " + selectedAuthor);
+            this.applyFilters();
         },
 
         onEditBook: function (oEvent) {
@@ -147,11 +153,11 @@ sap.ui.define([
                 onClose: function (sAction) {
                     if (sAction === MessageBox.Action.OK) {
                         var oModel = that.getView().getModel();
-                        var aBooks = oModel.getProperty("/books") || [];
-                        var idsToRemove = aSelected.map(function (it) { return it.getBindingContext().getObject().id; });
-                        aBooks = aBooks.filter(function (b) { return idsToRemove.indexOf(b.id) === -1; });
-                        oModel.setProperty("/books", aBooks);
-                        oModel.setProperty("/totalBooks", aBooks.length);
+                        var all = oModel.getProperty("/_allBooks") || [];
+                        var idsToRemove = aSelected.map(it => it.getBindingContext().getObject().id);
+                        all = all.filter(b => idsToRemove.indexOf(b.id) === -1);
+                        oModel.setProperty("/_allBooks", all);
+                        that.applyFilters();
                         oTable.removeSelections(true);
                         MessageToast.show("Deleted " + idsToRemove.length + " book(s) (frontend only)");
                     }
@@ -196,3 +202,4 @@ sap.ui.define([
         }
     });
 });
+
