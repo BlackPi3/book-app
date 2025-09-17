@@ -39,6 +39,13 @@ sap.ui.define([
                     return response.json();
                 })
                 .then(function(books) {
+                    // Normalize date strings (expecting ISO). Ignore invalid.
+                    books.forEach(function(b){
+                        if (b.created_on && typeof b.created_on === 'string') {
+                            // Leave as raw string; formatter will parse. Remove trailing Z microseconds variants if present.
+                            b.created_on = b.created_on.trim();
+                        }
+                    });
                     oModel.setProperty("/books", books);
                     oModel.setProperty("/totalBooks", books.length);
                     oModel.setProperty("/loading", false);
@@ -125,6 +132,31 @@ sap.ui.define([
             });
         },
 
+        onDeleteSelected: function () {
+            var oTable = this.byId("booksTable");
+            if (!oTable) { return; }
+            var aSelected = oTable.getSelectedItems();
+            if (!aSelected.length) {
+                MessageToast.show("Select books first");
+                return;
+            }
+            var that = this;
+            MessageBox.confirm("Delete " + aSelected.length + " selected book(s)?", {
+                onClose: function (sAction) {
+                    if (sAction === MessageBox.Action.OK) {
+                        var oModel = that.getView().getModel();
+                        var aBooks = oModel.getProperty("/books") || [];
+                        var idsToRemove = aSelected.map(function (it) { return it.getBindingContext().getObject().id; });
+                        aBooks = aBooks.filter(function (b) { return idsToRemove.indexOf(b.id) === -1; });
+                        oModel.setProperty("/books", aBooks);
+                        oModel.setProperty("/totalBooks", aBooks.length);
+                        oTable.removeSelections(true);
+                        MessageToast.show("Deleted " + idsToRemove.length + " book(s) (frontend only)");
+                    }
+                }
+            });
+        },
+
         onBookPress: function (oEvent) {
             var oContext = oEvent.getSource().getBindingContext();
             var book = oContext.getObject();
@@ -137,6 +169,19 @@ sap.ui.define([
                 "Created On: " + (book.created_on || "N/A"),
                 { title: "Book Information" }
             );
+        },
+
+        formatCreatedOn: function(v){
+            if(!v) return "";
+            // Accept ISO or date-only
+            var d = (v instanceof Date) ? v : new Date(v);
+            if (isNaN(d.getTime())) return ""; // avoid console error
+            // Return locale date/time short
+            try {
+                return d.toLocaleDateString() + " " + d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
+            } catch(e){
+                return d.toISOString();
+            }
         }
     });
 });
