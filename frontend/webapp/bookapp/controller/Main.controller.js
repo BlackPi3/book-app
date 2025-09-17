@@ -15,13 +15,14 @@ sap.ui.define([
                 loading: false,
                 searchQuery: "",
                 selectedAuthor: "",
+                selectedBooks: [], // added to prevent expression errors
                 authors: [
                     { key: "", text: "All Authors" }
                 ]
             });
-            
             this.getView().setModel(oModel);
-            
+            // eslint-disable-next-line no-console
+            console.log("[BookApp] Main.controller onInit: model initialized");
             // Load initial data
             this.loadBooks();
         },
@@ -29,61 +30,62 @@ sap.ui.define([
         loadBooks: function () {
             var oModel = this.getView().getModel();
             oModel.setProperty("/loading", true);
-
+            var that = this; // preserve context for logs
+            // eslint-disable-next-line no-console
+            console.log("[BookApp] loadBooks: starting fetch http://localhost:8000/books");
             // Check if backend is available
             fetch("http://localhost:8000/books")
                 .then(function(response) {
+                    // eslint-disable-next-line no-console
+                    console.log("[BookApp] loadBooks: response status", response.status);
                     if (!response.ok) {
-                        throw new Error("Backend not available");
+                        throw new Error("HTTP " + response.status);
                     }
                     return response.json();
                 })
                 .then(function(books) {
-                    // Normalize date strings (expecting ISO). Ignore invalid.
+                    // eslint-disable-next-line no-console
+                    console.log("[BookApp] loadBooks: parsed JSON count=", books.length, books.length ? books[0] : "<empty>");
                     books.forEach(function(b){
                         if (b.created_on && typeof b.created_on === 'string') {
-                            // Leave as raw string; formatter will parse. Remove trailing Z microseconds variants if present.
                             b.created_on = b.created_on.trim();
                         }
                     });
                     oModel.setProperty("/books", books);
+                    // Diagnostics after setting books
+                    var oTable = that.byId("booksTable");
+                    // eslint-disable-next-line no-console
+                    console.log("[BookApp] diagnostics: table instance=", oTable);
+                    // Delay to allow binding update
+                    setTimeout(function(){
+                        if (oTable) {
+                            // eslint-disable-next-line no-console
+                            console.log("[BookApp] diagnostics: items binding path=", oTable.getBinding("items")?.getPath(), "rendered items=", oTable.getItems().length);
+                        }
+                    },0);
                     oModel.setProperty("/totalBooks", books.length);
                     oModel.setProperty("/loading", false);
-                    
-                    // Extract unique authors
                     var authors = [{ key: "", text: "All Authors" }];
                     var uniqueAuthors = [...new Set(books.map(function(book) { return book.author; }))];
-                    uniqueAuthors.forEach(function(author) {
-                        authors.push({ key: author, text: author });
-                    });
+                    uniqueAuthors.forEach(function(author) { authors.push({ key: author, text: author }); });
                     oModel.setProperty("/authors", authors);
-                    
+                    // eslint-disable-next-line no-console
+                    console.log("[BookApp] loadBooks: model updated, authors=", authors.length);
                     MessageToast.show("Loaded " + books.length + " books successfully");
                 })
                 .catch(function(error) {
-                    console.error("Error loading books:", error);
+                    // eslint-disable-next-line no-console
+                    console.error("[BookApp] loadBooks: error", error);
                     oModel.setProperty("/loading", false);
-                    MessageBox.error("Failed to load books. Please ensure the backend server is running at http://localhost:8000");
-                    
-                    // Set some sample data for demo purposes
+                    MessageBox.error("Failed to load books. Using sample data. Backend at http://localhost:8000?");
                     var sampleBooks = [
-                        {
-                            id: 1,
-                            title: "Clean Code",
-                            author: "Robert Martin", 
-                            created_by: "demo_user",
-                            created_on: new Date().toISOString()
-                        },
-                        {
-                            id: 2,
-                            title: "The Pragmatic Programmer",
-                            author: "David Thomas",
-                            created_by: "demo_user", 
-                            created_on: new Date().toISOString()
-                        }
+                        { id: 1, title: "Clean Code", author: "Robert Martin", created_by: "demo_user", created_on: new Date().toISOString() },
+                        { id: 2, title: "The Pragmatic Programmer", author: "David Thomas", created_by: "demo_user", created_on: new Date().toISOString() }
                     ];
                     oModel.setProperty("/books", sampleBooks);
                     oModel.setProperty("/totalBooks", sampleBooks.length);
+                    // eslint-disable-next-line no-console
+                    console.log("[BookApp] loadBooks: fallback sample data applied", sampleBooks);
                 });
         },
 
@@ -169,6 +171,15 @@ sap.ui.define([
                 "Created On: " + (book.created_on || "N/A"),
                 { title: "Book Information" }
             );
+        },
+
+        onSelectionChange: function(){
+            var oTable = this.byId("booksTable");
+            if(!oTable) return;
+            var aContexts = oTable.getSelectedContexts();
+            var aBooks = aContexts.map(function(c){ return c.getObject(); });
+            var oModel = this.getView().getModel();
+            oModel.setProperty("/selectedBooks", aBooks);
         },
 
         formatCreatedOn: function(v){

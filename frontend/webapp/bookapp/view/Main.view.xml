@@ -46,6 +46,7 @@
             <!-- Books Table -->
             <Table id="booksTable"
                    items="{/books}"
+                   selectionChange="onSelectionChange"
                    growing="true"
                    growingThreshold="20"
                    mode="MultiSelect"
@@ -96,6 +97,14 @@
                     </ColumnListItem>
                 </items>
             </Table>
+
+            <!-- TEMP DEBUG: Simple list to verify binding outputs (remove later) -->
+            <Panel headerText="Debug Book Titles" expandable="true" expanded="false">
+                <List id="debugList" items="{/books}">
+                    <StandardListItem title="{title}" description="{author}"/>
+                </List>
+            </Panel>
+            <!-- END TEMP DEBUG -->
 
             <!-- Loading indicator -->
             <BusyIndicator id="loadingIndicator" visible="{/loading}" size="2rem"/>

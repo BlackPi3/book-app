@@ -16,21 +16,9 @@
             data-sap-ui-async="true"
             data-sap-ui-compatVersion="edge">
     </script>
+    <!-- Single bootstrap; app init handled in index.js (generated from index.ts) -->
+    <script src="./index.js"></script>
 </head>
 <body class="sapUiBody" id="content">
-<script>
-    sap.ui.require([
-        "sap/ui/core/Core",
-        "sap/ui/core/ComponentContainer"
-    ], function (Core, ComponentContainer) {
-        Core.ready().then(function () {
-            new ComponentContainer({
-                name: "bookapp",
-                async: true,
-                manifest: true
-            }).placeAt("content");
-        });
-    });
-</script>
 </body>
 </html>

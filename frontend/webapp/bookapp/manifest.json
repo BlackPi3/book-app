@@ -22,7 +22,7 @@
   },
   "sap.ui5": {
     "rootView": {
-      "viewName": "bookapp.view.Main",
+      "viewName": "bookapp.view.App",
       "type": "XML",
       "async": true
     },
